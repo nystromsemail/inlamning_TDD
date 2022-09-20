@@ -8,13 +8,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class Egenskap1Test {
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
+    @CsvSource(value = {"anna, losen_bad", "berit, 123456_bad", "kalle, password_bad"})
     public void logIn(String username, String password) {
         // Given
         List<AppUser> allUsers = List.of(
@@ -31,13 +30,14 @@ public class Egenskap1Test {
                 .filter(appUser -> appUser.getUsername().equals(username))
                 .findAny()
                 .orElseThrow();
+        boolean isSame = password.equals(foundUser.getPassword());
 
         // Then
-        assertEquals(password, foundUser.getPassword());
+        assertTrue(isSame);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, 123456", "berit, password", "kalle, losen"})
+    @CsvSource(value = {"anna, 123456_bad", "berit, password_bad", "kalle, losen_bad"})
     public void logIn_withBadCredentials_shouldReturnFalse(String username, String password) {
         // Given
         List<AppUser> allUsers = List.of(
@@ -54,9 +54,10 @@ public class Egenskap1Test {
                 .filter(appUser -> appUser.getUsername().equals(username))
                 .findAny()
                 .orElseThrow();
+        boolean isSame = password.equals(foundUser.getPassword());
 
         // Then
-        assertNotEquals(password, foundUser.getPassword());
+        assertFalse(isSame);
     }
 
 }
