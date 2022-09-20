@@ -12,9 +12,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class Egenskap1Test {
 
+    private UserService userService;
+
     @ParameterizedTest
-    @CsvSource(value = {"anna, losen_bad", "berit, 123456_bad", "kalle, password_bad"})
-    public void logIn(String username, String password) {
+    @CsvSource(value = {"anna, 123456", "berit, password", "kalle, losen"})
+    public void logInTest(String username, String password) {
         // Given
         List<AppUser> allUsers = List.of(
                 new AppUser("anna", "losen"),
@@ -26,19 +28,15 @@ public class Egenskap1Test {
         );
 
         // When
-        AppUser foundUser = allUsers.stream()
-                .filter(appUser -> appUser.getUsername().equals(username))
-                .findAny()
-                .orElseThrow();
-        boolean isSame = password.equals(foundUser.getPassword());
+        boolean isCorrectPassword = userService.logIn(username, password);
 
         // Then
-        assertTrue(isSame);
+        assertTrue(isCorrectPassword);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, 123456_bad", "berit, password_bad", "kalle, losen_bad"})
-    public void logIn_withBadCredentials_shouldReturnFalse(String username, String password) {
+    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
+    public void logInTest_withBadCredentials_shouldReturnFalse(String username, String password) {
         // Given
         List<AppUser> allUsers = List.of(
                 new AppUser("anna", "losen"),
@@ -50,14 +48,10 @@ public class Egenskap1Test {
         );
 
         // When
-        AppUser foundUser = allUsers.stream()
-                .filter(appUser -> appUser.getUsername().equals(username))
-                .findAny()
-                .orElseThrow();
-        boolean isSame = password.equals(foundUser.getPassword());
+        boolean isCorrectPassword = userService.logIn(username, password);
 
         // Then
-        assertFalse(isSame);
+        assertFalse(isCorrectPassword);
     }
 
 }
