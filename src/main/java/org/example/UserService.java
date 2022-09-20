@@ -1,8 +1,11 @@
 package org.example;
 
+import javax.security.auth.login.FailedLoginException;
+import java.util.Base64;
 import java.util.List;
 
 public class UserService {
+
     List<AppUser> allUsers = List.of(
             new AppUser("anna", "losen"),
             new AppUser("anton", "qwerty"),
@@ -12,11 +15,28 @@ public class UserService {
             new AppUser("karin", "abc123")
     );
 
-    public boolean logIn(String username, String password) {
+    public String logIn(String username, String password) throws FailedLoginException {
         AppUser foundUser = allUsers.stream()
                 .filter(u -> u.getUsername().equals(username))
                 .findFirst()
-                .orElseThrow();
-        return password.equals(foundUser.getPassword());
+                .orElseThrow(() -> new FailedLoginException("Incorrect combination of username and password!"));
+        String foundPassword = foundUser.getPassword();
+        if (foundPassword.equals(password)) {
+            byte[] foundUserAsBytes = foundUser.getUsername().getBytes();
+            byte[] foundUserAsBase64 = Base64.getEncoder().encode(foundUserAsBytes);
+            String foundUserAs64String = new String(foundUserAsBase64);
+            return foundUserAs64String;
+        } else {
+            throw new FailedLoginException("Incorrect combination of username and password!");
+        }
+    }
+
+    public boolean verifyToken(String token) {
+        byte[] tokenAsBase64 = token.getBytes();
+        byte[] tokenAsBytes = Base64.getDecoder().decode(tokenAsBase64);
+        String decodedToken = new String(tokenAsBytes);
+        boolean isToken = allUsers.stream()
+                .anyMatch(u -> u.getUsername().equals(decodedToken));
+        return isToken;
     }
 }

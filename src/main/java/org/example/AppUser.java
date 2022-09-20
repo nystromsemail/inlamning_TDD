@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Objects;
+
 public class AppUser {
 
     String username;
