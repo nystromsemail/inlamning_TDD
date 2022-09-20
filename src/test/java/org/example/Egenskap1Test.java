@@ -20,7 +20,7 @@ public class Egenskap1Test {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, 123456", "berit, password", "kalle, losen"})
+    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
     public void logInTest(String username, String password) {
         // Given
 
@@ -32,7 +32,7 @@ public class Egenskap1Test {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
+    @CsvSource(value = {"anna, losen_bad", "berit, 123456_bad", "kalle, password_bad"})
     public void logInTest_withBadCredentials_shouldReturnFalse(String username, String password) {
         // Given
 
