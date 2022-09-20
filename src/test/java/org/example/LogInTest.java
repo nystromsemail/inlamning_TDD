@@ -21,8 +21,8 @@ public class LogInTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, losen_bad", "berit, 123456_bad", "kalle, password_bad"})
-    public void logInTest(String username, String password) throws FailedLoginException {
+    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
+    public void logInTest(String username, String password) {
         // Given
 
         // When, Then
@@ -36,20 +36,20 @@ public class LogInTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
-    public void logInTest_withBadCredentials_shouldThrow(String username, String password) throws FailedLoginException {
+    @CsvSource(value = {"anna, losen_bad", "berit, 123456_bad", "kalle, password_bad"})
+    public void logInTest_withBadCredentials_shouldThrow(String username, String password) {
         // Given
 
         // When, Then
         FailedLoginException err = assertThrows(FailedLoginException.class, () -> userService.logIn(username, password));
-        assertEquals("Incorrect combination of username and password!!", err.getMessage());
+        assertEquals("Incorrect combination of username and password!", err.getMessage());
     }
 
     @Test
     public void tokenTest() {
         // testar om token genererar ett användarnamn som finns i listan av användarnamn
         // Given
-        String token = "fdasfsafafsafdsa"; // sadfsafda
+        String token = "YW5uYQ=="; // Base64 för "anna"
 
         // When
         boolean isToken = userService.verifyToken(token);
@@ -61,7 +61,7 @@ public class LogInTest {
     @Test
     public void tokenTest_withBadToken_shouldReturnFalse() {
         // Given
-        String token = "YW5uYQ=="; // Base64 för "anna"
+        String token = "fdasfsafafsafdsa"; // sadfsafda
 
         // When
         boolean isToken = userService.verifyToken(token);
