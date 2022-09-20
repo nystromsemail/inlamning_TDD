@@ -14,18 +14,15 @@ public class Egenskap1Test {
 
     private UserService userService;
 
+    @BeforeEach
+    public void setUp() {
+        userService = new UserService();
+    }
+
     @ParameterizedTest
     @CsvSource(value = {"anna, 123456", "berit, password", "kalle, losen"})
     public void logInTest(String username, String password) {
         // Given
-        List<AppUser> allUsers = List.of(
-                new AppUser("anna", "losen"),
-                new AppUser("anton", "qwerty"),
-                new AppUser("berit", "123456"),
-                new AppUser("bert", "hejsan"),
-                new AppUser("kalle", "password"),
-                new AppUser("karin", "abc123")
-        );
 
         // When
         boolean isCorrectPassword = userService.logIn(username, password);
@@ -38,14 +35,6 @@ public class Egenskap1Test {
     @CsvSource(value = {"anna, losen", "berit, 123456", "kalle, password"})
     public void logInTest_withBadCredentials_shouldReturnFalse(String username, String password) {
         // Given
-        List<AppUser> allUsers = List.of(
-                new AppUser("anna", "losen"),
-                new AppUser("anton", "qwerty"),
-                new AppUser("berit", "123456"),
-                new AppUser("bert", "hejsan"),
-                new AppUser("kalle", "password"),
-                new AppUser("karin", "abc123")
-        );
 
         // When
         boolean isCorrectPassword = userService.logIn(username, password);
