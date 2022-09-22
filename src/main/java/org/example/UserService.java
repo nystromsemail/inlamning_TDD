@@ -61,7 +61,7 @@ public class UserService {
         Key key = Keys.hmacShaKeyFor("BrackeliKrankelFnatt".repeat(2).getBytes());
         String generatedToken = Jwts.builder()
                 .setSubject(username)
-                .addClaims(Map.of("Role", foundUser.getRole() + "extratext"))
+                .addClaims(Map.of("Role", foundUser.getRole()))
                 .signWith(key)
                 .compact();
 
