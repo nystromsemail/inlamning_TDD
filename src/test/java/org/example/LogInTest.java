@@ -1,5 +1,7 @@
 package org.example;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -7,13 +9,19 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 
 import javax.security.auth.login.FailedLoginException;
-import java.util.Base64;
+
+import java.security.Key;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class LogInTest {
 
     private UserService userService;
+
+    @Mock
+    UserRepo userRepo;
 
     @BeforeEach
     public void setUp() {
@@ -52,7 +60,7 @@ public class LogInTest {
         String token = "YW5uYQ=="; // Base64 för "anna"
 
         // When
-        boolean isToken = userService.verifyToken(token);
+        boolean isToken = userService.verify64Token(token);
 
         // Then
         assertTrue(isToken);
@@ -64,9 +72,33 @@ public class LogInTest {
         String token = "fdasfsafafsafdsa"; // sadfsafda
 
         // When
-        boolean isToken = userService.verifyToken(token);
+        boolean isToken = userService.verify64Token(token);
 
         // Then
         assertFalse(isToken);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"anna, STUDENT", "berit, TEACHER", "kalle, ADMIN"})
+    public void jwtTokenTest(String username, String role) {
+        // Given
+        Key key = Keys.hmacShaKeyFor("BrackeliKrankelFnatt".getBytes());
+        when(userRepo.findAllUsers()).thenReturn(List.of(
+                new AppUser("anna", "losen", "STUDENT"),
+                new AppUser("berit", "123456", "TEACHER"),
+                new AppUser("kalle", "password", "ADMIN")
+        ));
+
+        // When
+        String signedJwtToken = userService.generateToken(username);
+        String decryptedRole = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(signedJwtToken)
+                .getBody()
+                .get("Role", String.class);
+
+        // Then
+        assertEquals(role, decryptedRole);
     }
 }

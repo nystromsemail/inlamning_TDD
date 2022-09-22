@@ -31,7 +31,7 @@ public class UserService {
         }
     }
 
-    public boolean verifyToken(String token) {
+    public boolean verify64Token(String token) {
         byte[] tokenAsBase64 = token.getBytes();
         byte[] tokenAsBytes = Base64.getDecoder().decode(tokenAsBase64);
         String decodedToken = new String(tokenAsBytes);
