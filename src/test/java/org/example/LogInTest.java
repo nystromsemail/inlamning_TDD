@@ -4,9 +4,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.security.auth.login.FailedLoginException;
 
@@ -16,6 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class LogInTest {
 
     private UserService userService;
@@ -25,7 +28,7 @@ public class LogInTest {
 
     @BeforeEach
     public void setUp() {
-        userService = new UserService();
+        userService = new UserService(userRepo);
     }
 
     @ParameterizedTest
@@ -82,7 +85,7 @@ public class LogInTest {
     @CsvSource(value = {"anna, STUDENT", "berit, TEACHER", "kalle, ADMIN"})
     public void jwtTokenTest(String username, String role) {
         // Given
-        Key key = Keys.hmacShaKeyFor("BrackeliKrankelFnatt".getBytes());
+        Key key = Keys.hmacShaKeyFor("BrackeliKrankelFnatt".repeat(2).getBytes());
         when(userRepo.findAllUsers()).thenReturn(List.of(
                 new AppUser("anna", "losen", "STUDENT"),
                 new AppUser("berit", "123456", "TEACHER"),

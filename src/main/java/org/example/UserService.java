@@ -1,19 +1,30 @@
 package org.example;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
 import javax.security.auth.login.FailedLoginException;
+import java.security.Key;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 public class UserService {
 
+    UserRepo userRepo;
+
     List<AppUser> allUsers = List.of(
-            new AppUser("anna", "losen"),
-            new AppUser("anton", "qwerty"),
-            new AppUser("berit", "123456"),
-            new AppUser("bert", "hejsan"),
-            new AppUser("kalle", "password"),
-            new AppUser("karin", "abc123")
+            new AppUser("anna", "losen", ""),
+            new AppUser("anton", "qwerty", ""),
+            new AppUser("berit", "123456", ""),
+            new AppUser("bert", "hejsan", ""),
+            new AppUser("kalle", "password", ""),
+            new AppUser("karin", "abc123", "")
     );
+
+    public UserService(UserRepo userRepo) {
+        this.userRepo = userRepo;
+    }
 
     public String logIn(String username, String password) throws FailedLoginException {
         AppUser foundUser = allUsers.stream()
@@ -38,5 +49,23 @@ public class UserService {
         boolean isToken = allUsers.stream()
                 .anyMatch(u -> u.getUsername().equals(decodedToken));
         return isToken;
+    }
+
+    public String generateToken(String username) {
+        AppUser foundUser = userRepo.findAllUsers()
+                .stream()
+                .filter(u -> u.getUsername().equals(username))
+                .findFirst()
+                .orElseThrow();
+
+        Key key = Keys.hmacShaKeyFor("BrackeliKrankelFnatt".repeat(2).getBytes());
+        String generatedToken = Jwts.builder()
+                .setSubject(username)
+                .addClaims(Map.of("Role", foundUser.getRole() + "extratext"))
+                .signWith(key)
+                .compact();
+
+        return generatedToken;
+
     }
 }
